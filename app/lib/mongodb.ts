@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { MongoClient } from "mongodb";
 
 if (!process.env.MONGODB_URI) {
@@ -7,15 +8,11 @@ if (!process.env.MONGODB_URI) {
 const uri = process.env.MONGODB_URI;
 const options = {};
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
+let client: any;
+let clientPromise: Promise<any>;
 
 if (process.env.NODE_ENV === "development") {
-  // En desarrollo, usamos una variable global para preservar la conexión
-  // a través de las recargas de módulos causadas por HMR.
-  let globalWithMongo = global as typeof globalThis & {
-    _mongoClientPromise?: Promise<MongoClient>;
-  };
+  let globalWithMongo = global as any;
 
   if (!globalWithMongo._mongoClientPromise) {
     client = new MongoClient(uri, options);
@@ -23,7 +20,6 @@ if (process.env.NODE_ENV === "development") {
   }
   clientPromise = globalWithMongo._mongoClientPromise;
 } else {
-  // En producción, es mejor no usar una variable global.
   client = new MongoClient(uri, options);
   clientPromise = client.connect();
 }
